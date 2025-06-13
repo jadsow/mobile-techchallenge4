@@ -1,11 +1,11 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import AppNavigator from "./src/navigation/AppNavigator";
+import AuthStack from "./AuthStack";
 
-export default function App() {
+export default function Routes() {
   return (
     <NavigationContainer>
-      <AppNavigator />
+      <AuthStack />
     </NavigationContainer>
   );
 }
