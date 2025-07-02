@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  Alert,
-  ScrollView,
-} from "react-native";
+import { Text, TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
+import { LoadingButton } from "../../components/LoadingButton";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type Props = NativeStackScreenProps<RootStackParamList, "EditPost">;
 
@@ -25,9 +19,8 @@ export default function EditPostScreen({ route, navigation }: Props) {
     const fetchPost = async () => {
       const token = await AsyncStorage.getItem("access_token");
       if (!token) {
-        Alert.alert("Erro", "Token não encontrado");
-        navigation.replace("Login");
-        return;
+        toastError("Erro", "Token não encontrado");
+        return navigation.replace("Login");
       }
 
       try {
@@ -36,6 +29,7 @@ export default function EditPostScreen({ route, navigation }: Props) {
             Authorization: `Bearer ${token}`,
           },
         });
+
         if (!response.ok) throw new Error("Erro ao buscar post");
 
         const data = await response.json();
@@ -43,7 +37,7 @@ export default function EditPostScreen({ route, navigation }: Props) {
         setContent(data.content);
         setAuthor(data.author);
       } catch (err) {
-        Alert.alert("Erro", "Falha ao carregar post");
+        toastError("Erro", "Falha ao carregar post");
       }
     };
 
@@ -53,9 +47,8 @@ export default function EditPostScreen({ route, navigation }: Props) {
   const handleUpdatePost = async () => {
     const token = await AsyncStorage.getItem("access_token");
     if (!token) {
-      Alert.alert("Erro", "Token não encontrado");
-      navigation.replace("Login");
-      return;
+      toastError("Erro", "Token não encontrado");
+      return navigation.replace("Login");
     }
 
     try {
@@ -76,69 +69,55 @@ export default function EditPostScreen({ route, navigation }: Props) {
         throw new Error("Erro ao atualizar o post");
       }
 
-      Alert.alert("Sucesso", "Post atualizado com sucesso");
+      toastSuccess("Sucesso", "Post atualizado com sucesso");
       navigation.navigate("Home"); // volta para home
     } catch (err) {
-      Alert.alert("Erro", "Falha ao atualizar post");
+      toastError("Erro", "Falha ao atualizar post");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Título</Text>
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+      }}
+      className="bg-white px-4 pt-6 pb-10"
+    >
+      <Text className="m-2 text-lg text-fiap-secondary">Título</Text>
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 focus:border-fiap-primary"
         value={title}
         onChangeText={setTitle}
         placeholder="Digite o título"
       />
 
-      <Text style={styles.label}>Conteúdo</Text>
+      <Text className=" mt-3 mb-2 text-lg text-fiap-secondary">Conteúdo</Text>
       <TextInput
-        style={[styles.input, { height: 120 }]}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 h-32 text-justify focus:border-fiap-primary"
         value={content}
         onChangeText={setContent}
-        multiline
         placeholder="Digite o conteúdo"
+        multiline
+        textAlignVertical="top"
       />
 
-      <Text style={styles.label}>Autor</Text>
+      <Text className="mt-3 mb-2 text-lg text-fiap-secondary">Autor</Text>
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 focus:border-fiap-primary"
         value={author}
         onChangeText={setAuthor}
         placeholder="Digite o autor"
       />
 
-      <View style={{ marginTop: 20 }}>
-        <Button
-          title={loading ? "Salvando..." : "Salvar Alterações"}
-          onPress={handleUpdatePost}
-          disabled={loading}
-        />
-      </View>
+      <LoadingButton
+        className="bg-fiap-primary rounded-lg p-4 items-center mt-8"
+        text="Salvar alterações"
+        disabled={loading}
+        loading={loading}
+        onPress={handleUpdatePost}
+      />
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    backgroundColor: "#fff",
-    flexGrow: 1,
-  },
-  label: {
-    fontWeight: "bold",
-    marginBottom: 6,
-    marginTop: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    backgroundColor: "#f9f9f9",
-  },
-});
