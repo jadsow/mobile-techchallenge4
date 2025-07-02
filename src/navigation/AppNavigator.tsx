@@ -40,9 +40,21 @@ export default function AppNavigator() {
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="PostDetail" component={PostDetailScreen} />
-      <Stack.Screen name="CreatePost" component={CreatePostScreen} />
-      <Stack.Screen name="EditPost" component={EditPostScreen} />
+      <Stack.Screen
+        name="PostDetail"
+        component={PostDetailScreen}
+        options={{ headerTitle: "Detalhes" }}
+      />
+      <Stack.Screen
+        name="CreatePost"
+        component={CreatePostScreen}
+        options={{ headerTitle: "" }}
+      />
+      <Stack.Screen
+        name="EditPost"
+        component={EditPostScreen}
+        options={{ headerTitle: "Editar" }}
+      />
       <Stack.Screen name="ProfessoresList" component={ProfessoresListScreen} />
       <Stack.Screen name="EditProfessor" component={EditProfessorScreen} />
       <Stack.Screen name="CreateProfessor" component={CreateProfessorScreen} />
