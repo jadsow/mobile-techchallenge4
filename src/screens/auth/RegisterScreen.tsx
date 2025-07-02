@@ -1,8 +1,9 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
-import { Alert, Platform, Text, TextInput, View } from "react-native";
+import { Platform, Text, TextInput, View } from "react-native";
 import { LoadingButton } from "../../components/LoadingButton";
 import { RegisterScreenNavigationProp } from "../../navigation/types";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type Props = {
   navigation: RegisterScreenNavigationProp;
@@ -25,18 +26,15 @@ export default function RegisterScreen({ navigation }: Props) {
 
   const handleRegister = async () => {
     if (!nome || !email || !senha || !confirmarSenha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
+      return toastError("Erro", "Preencha todos os campos.");
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Erro", "Por favor, insira um email válido.");
-      return;
+      return toastError("Erro", "Por favor, insira um email válido.");
     }
 
     if (senha !== confirmarSenha) {
-      Alert.alert("Erro", "As senhas não coincidem.");
-      return;
+      return toastError("Erro", "As senhas não coincidem.");
     }
 
     const payload: any = { nome, email, senha };
@@ -60,10 +58,11 @@ export default function RegisterScreen({ navigation }: Props) {
         throw new Error(errorData.message || "Erro no cadastro.");
       }
 
-      Alert.alert("Sucesso", "Usuário registrado com sucesso!");
+      toastSuccess("Sucesso", "Usuário registrado com sucesso!");
+
       navigation.navigate("Login");
     } catch (error: any) {
-      Alert.alert("Erro", error.message || "Erro ao registrar.");
+      toastError("Erro", error.message || "Erro ao registrar.");
     } finally {
       setLoading(false);
     }
