@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState } from "react";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { LoadingButton } from "../../components/LoadingButton";
 import { RootStackParamList } from "../../navigation/types";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -40,10 +41,10 @@ export default function LoginScreen({ navigation }: Props) {
 
       const data = await response.json();
       await AsyncStorage.setItem("access_token", data.access_token);
-      Alert.alert("Login realizado com sucesso!");
+      toastSuccess("Sucesso", "Login realizado com sucesso!");
       navigation.replace("Home");
     } catch (error: any) {
-      Alert.alert("Erro", error.message || "Erro ao fazer login");
+      toastError("Erro", error.message || "Erro ao fazer login");
     } finally {
       setLoading(false);
     }
