@@ -60,7 +60,7 @@ export default function LoginScreen({ navigation }: Props) {
       </Text>
 
       <TextInput
-        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Email"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -69,7 +69,7 @@ export default function LoginScreen({ navigation }: Props) {
       />
 
       <TextInput
-        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Senha"
         secureTextEntry
         value={senha}

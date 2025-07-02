@@ -75,14 +75,14 @@ export default function RegisterScreen({ navigation }: Props) {
       </Text>
 
       <TextInput
-        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Nome"
         value={nome}
         onChangeText={setNome}
       />
 
       <TextInput
-        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Email"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -91,7 +91,7 @@ export default function RegisterScreen({ navigation }: Props) {
       />
 
       <TextInput
-        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Senha"
         secureTextEntry
         value={senha}
@@ -99,7 +99,7 @@ export default function RegisterScreen({ navigation }: Props) {
       />
 
       <TextInput
-        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Confirmar Senha"
         secureTextEntry
         value={confirmarSenha}
