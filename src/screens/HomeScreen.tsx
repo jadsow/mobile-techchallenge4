@@ -187,7 +187,7 @@ export default function HomeScreen() {
             onPress={handleCreatePost}
           >
             <Text className="text-white font-semibold text-base">
-              Criar Post
+              + Criar Post
             </Text>
           </TouchableOpacity>
 
@@ -233,38 +233,40 @@ export default function HomeScreen() {
                 navigation.navigate("PostDetail", { postId: item._id })
               }
             >
-              <Text className="text-lg font-semibold mb-1 color-fiap-primary">
-                {item.title}
-              </Text>
-              <Text className="text-gray-600 py-4">
-                {item.content.substring(0, 100)}...
-              </Text>
+              <View className="flex-1 flex-col gap-3">
+                <Text className="text-lg text-start font-semibold color-fiap-primary">
+                  {item.title}
+                </Text>
+                <Text className="text-gray-600">
+                  {item.content.substring(0, 100)}...
+                </Text>
 
-              {role === "professor" && (
-                <View className="flex-row justify-between mt-3">
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("EditPost", { postId: item._id })
-                    }
-                    className="flex-row items-center border border-blue-500 rounded-md px-3 py-2"
-                  >
-                    <Icon name="edit-2" size={16} color="#3B82F6" />
-                    <Text className="text-blue-500 font-semibold ml-2">
-                      Editar
-                    </Text>
-                  </TouchableOpacity>
+                {role === "professor" && (
+                  <View className="flex-row justify-between mt-1">
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("EditPost", { postId: item._id })
+                      }
+                      className="flex-row items-center border border-blue-500 rounded-md px-3 py-2"
+                    >
+                      <Icon name="edit-2" size={16} color="#3B82F6" />
+                      <Text className="text-blue-500 font-semibold ml-2">
+                        Editar
+                      </Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    onPress={() => handleDeletePost(item._id)}
-                    className="flex-row items-center bg-red-100 rounded-md px-3 py-2"
-                  >
-                    <Icon name="trash-2" size={16} color="#DC2626" />
-                    <Text className="text-red-600 font-semibold ml-2">
-                      Excluir
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+                    <TouchableOpacity
+                      onPress={() => handleDeletePost(item._id)}
+                      className="flex-row items-center bg-red-100 rounded-md px-3 py-2"
+                    >
+                      <Icon name="trash-2" size={16} color="#DC2626" />
+                      <Text className="text-red-600 font-semibold ml-2">
+                        Excluir
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
             </TouchableOpacity>
           )}
         />
