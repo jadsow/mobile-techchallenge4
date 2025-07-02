@@ -21,7 +21,7 @@ export function LoadingButton({
   return (
     <TouchableOpacity {...props}>
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator className="color-fiap-gray" />
       ) : (
         <Text className="color-white font-semibold text-md" {...textProps}>
           {text}
