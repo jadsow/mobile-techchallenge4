@@ -35,7 +35,11 @@ export default function AppNavigator() {
           headerTitle: "",
         }}
       />
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="PostDetail" component={PostDetailScreen} />
       <Stack.Screen name="CreatePost" component={CreatePostScreen} />
       <Stack.Screen name="EditPost" component={EditPostScreen} />
