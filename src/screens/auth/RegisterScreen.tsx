@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import React, { useState } from "react";
+import { Alert, Platform, Text, TextInput, View } from "react-native";
+import { LoadingButton } from "../../components/LoadingButton";
 import { RegisterScreenNavigationProp } from "../../navigation/types";
 
 type Props = {
@@ -15,8 +16,8 @@ export default function RegisterScreen({ navigation }: Props) {
   const [tipoUsuario, setTipoUsuario] = useState<"professor" | "aluno">(
     "aluno"
   );
+  const [loading, setLoading] = useState(false);
 
-  // Função para validar email
   const isValidEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -38,15 +39,8 @@ export default function RegisterScreen({ navigation }: Props) {
       return;
     }
 
-    const payload: any = {
-      nome,
-      email,
-      senha,
-    };
-
-    if (tipoUsuario === "professor") {
-      payload.role = "professor";
-    }
+    const payload: any = { nome, email, senha };
+    if (tipoUsuario === "professor") payload.role = "professor";
 
     const endpoint =
       tipoUsuario === "professor"
@@ -54,11 +48,10 @@ export default function RegisterScreen({ navigation }: Props) {
         : "http://10.0.2.2:3010/alunos";
 
     try {
+      setLoading(true);
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -71,22 +64,26 @@ export default function RegisterScreen({ navigation }: Props) {
       navigation.navigate("Login");
     } catch (error: any) {
       Alert.alert("Erro", error.message || "Erro ao registrar.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastro</Text>
+    <View className="flex-1 justify-center px-4 bg-white">
+      <Text className="text-3xl font-semibold text-center mb-6 color-fiap-primary">
+        Cadastro
+      </Text>
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
         placeholder="Nome"
         value={nome}
         onChangeText={setNome}
       />
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
         placeholder="Email"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -95,7 +92,7 @@ export default function RegisterScreen({ navigation }: Props) {
       />
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
         placeholder="Senha"
         secureTextEntry
         value={senha}
@@ -103,61 +100,46 @@ export default function RegisterScreen({ navigation }: Props) {
       />
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200"
         placeholder="Confirmar Senha"
         secureTextEntry
         value={confirmarSenha}
         onChangeText={setConfirmarSenha}
       />
 
-      <Text style={styles.label}>Tipo de usuário:</Text>
-      <Picker
-        selectedValue={tipoUsuario}
-        onValueChange={(itemValue) => setTipoUsuario(itemValue)}
-        style={styles.picker}
+      <Text className="text-base font-medium color-fiap-secondary mb-2">
+        Tipo de usuário:
+      </Text>
+
+      <View
+        className={`rounded-md border border-gray-200 mb-6 ${
+          Platform.OS === "android" ? "overflow-hidden" : ""
+        }`}
       >
-        <Picker.Item label="Aluno" value="aluno" />
-        <Picker.Item label="Professor" value="professor" />
-      </Picker>
+        <Picker
+          selectedValue={tipoUsuario}
+          onValueChange={(itemValue) => setTipoUsuario(itemValue)}
+          style={{ backgroundColor: "#f3f4f6" }}
+          dropdownIconColor="#374151"
+        >
+          <Picker.Item label="Aluno" value="aluno" />
+          <Picker.Item label="Professor" value="professor" />
+        </Picker>
+      </View>
 
-      <Button title="Registrar" onPress={handleRegister} />
+      <LoadingButton
+        className="bg-fiap-primary rounded-lg p-4 items-center mt-2"
+        text="Registrar"
+        loading={loading}
+        onPress={handleRegister}
+      />
 
-      <View style={styles.spacer} />
-      <Button
-        title="Voltar ao Login"
+      <LoadingButton
+        className="border-fiap-primary border-[1px] rounded-lg p-4 items-center mt-3"
+        text="Voltar ao Login"
+        textProps={{ className: "color-fiap-primary font-semibold" }}
         onPress={() => navigation.navigate("Login")}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  picker: {
-    marginBottom: 24,
-  },
-  spacer: {
-    height: 12,
-  },
-});
