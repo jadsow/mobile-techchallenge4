@@ -2,18 +2,21 @@ import React, { useState, useRef } from "react";
 import {
   View,
   Text,
-  Button,
-  StyleSheet,
   FlatList,
   Alert,
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { jwtDecode } from "jwt-decode"; // corrigi a importação aqui
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
+import { toastError, toastSuccess } from "../helpers/toast";
+
+import Icon from "react-native-vector-icons/Feather";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
 
@@ -54,7 +57,7 @@ export default function HomeScreen() {
           setToken(storedToken);
           fetchPosts(storedToken, ""); // aqui busca todos os posts novamente
         } catch (err) {
-          Alert.alert("Erro", "Token inválido");
+          toastError("Erro", "Token inválido");
           navigation.replace("Login");
         }
       };
@@ -89,10 +92,10 @@ export default function HomeScreen() {
               throw new Error("Erro ao excluir");
             }
 
-            Alert.alert("Sucesso", "Post excluído com sucesso.");
+            toastSuccess("Sucesso", "Post excluído com sucesso.");
             fetchPosts(token!, searchText); // atualiza a lista
           } catch (err) {
-            Alert.alert("Erro", "Não foi possível excluir o post.");
+            toastError("Erro", "Não foi possível excluir o post.");
           }
         },
       },
@@ -123,7 +126,7 @@ export default function HomeScreen() {
       }
     } catch (error) {
       setPosts([]);
-      Alert.alert("Post não encontrado.");
+      toastError("Erro", "Nenhum post encontrado.");
     } finally {
       setLoading(false);
     }
@@ -153,74 +156,112 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo!</Text>
-      {role && (
-        <Text style={styles.subtitle}>Você está logado como: {role}</Text>
-      )}
+    <SafeAreaView className="flex-1 px-5 py-6 bg-gray-50">
+      <View className="flex-row justify-between items-center mb-6">
+        {role && (
+          <Text className="text-center text-md color-fiap-gray">
+            Você está logado como <Text className="font-semibold">{role}</Text>
+          </Text>
+        )}
+        <TouchableOpacity
+          activeOpacity={0.2}
+          className="flex-row gap-3 justify-between rounded-lg py-3 items-center press"
+          onPress={handleLogout}
+        >
+          <Text className="color-fiap-secondary font-semibold text-lg">
+            Sair
+          </Text>
+          <Icon name="log-out" size={24} color="#BF3B5E" />
+        </TouchableOpacity>
+      </View>
+
+      <Text className="text-3xl font-bold text-center mb-2 color-fiap-primary">
+        Bem-vindo {role ? role : ""}!
+      </Text>
 
       {role === "professor" && (
-        <>
-          <Button title="Criar Post" onPress={handleCreatePost} />
-
+        <View className="gap-3 mb-6">
           <TouchableOpacity
-            style={styles.botaoProfessores}
-            onPress={() => navigation.navigate("ProfessoresList")}
+            activeOpacity={0.8}
+            className="bg-fiap-primary rounded-lg py-3 items-center"
+            onPress={handleCreatePost}
           >
-            <Text style={styles.textoBotao}>Ver Professores</Text>
+            <Text className="text-white font-semibold text-base">
+              Criar Post
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.botaoProfessores}
-            onPress={() => navigation.navigate("AlunosList")}
-          >
-            <Text style={styles.textoBotao}>Ver Alunos</Text>
-          </TouchableOpacity>
-        </>
+          <View className="flex-row justify-between">
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ProfessoresList")}
+            >
+              <Text className="text-gray-700 underline">Ver Professores</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("AlunosList")}>
+              <Text className="text-gray-700 underline">Ver Alunos</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
       <TextInput
-        style={styles.searchInput}
+        className="border border-gray-300 rounded-lg p-3 mb-4 bg-white focus:border-fiap-primary"
         placeholder="Buscar posts..."
         value={searchText}
         onChangeText={onChangeSearchText}
       />
 
-      <Text style={styles.sectionTitle}>Posts:</Text>
+      <Text className="text-lg font-bold mb-3">Posts:</Text>
+
       {loading ? (
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          Carregando...
+        <Text className="text-center mt-4 text-gray-500">Carregando...</Text>
+      ) : posts.length === 0 ? (
+        <Text className="text-center mt-4 text-gray-500">
+          Nenhum post encontrado.
         </Text>
       ) : (
         <FlatList
           data={posts}
           keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 60 }}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.postCard}
+              activeOpacity={0.9}
+              className="bg-white rounded-xl p-4 mb-4 border border-gray-200 shadow-sm"
               onPress={() =>
                 navigation.navigate("PostDetail", { postId: item._id })
               }
             >
-              <Text style={styles.postTitle}>{item.title}</Text>
-              <Text>{item.content.substring(0, 100)}...</Text>
+              <Text className="text-lg font-semibold mb-1 color-fiap-primary">
+                {item.title}
+              </Text>
+              <Text className="text-gray-600 py-4">
+                {item.content.substring(0, 100)}...
+              </Text>
 
               {role === "professor" && (
-                <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
+                <View className="flex-row justify-between mt-3">
                   <TouchableOpacity
-                    style={[styles.editButton, { backgroundColor: "#007bff" }]}
                     onPress={() =>
                       navigation.navigate("EditPost", { postId: item._id })
                     }
+                    className="flex-row items-center border border-blue-500 rounded-md px-3 py-2"
                   >
-                    <Text style={styles.editButtonText}>Editar</Text>
+                    <Icon name="edit-2" size={16} color="#3B82F6" />
+                    <Text className="text-blue-500 font-semibold ml-2">
+                      Editar
+                    </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[styles.editButton, { backgroundColor: "red" }]}
                     onPress={() => handleDeletePost(item._id)}
+                    className="flex-row items-center bg-red-100 rounded-md px-3 py-2"
                   >
-                    <Text style={styles.editButtonText}>Excluir</Text>
+                    <Icon name="trash-2" size={16} color="#DC2626" />
+                    <Text className="text-red-600 font-semibold ml-2">
+                      Excluir
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -228,61 +269,6 @@ export default function HomeScreen() {
           )}
         />
       )}
-
-      <View style={{ marginTop: 20 }}>
-        <Button title="Sair" color="red" onPress={handleLogout} />
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  subtitle: { textAlign: "center", marginBottom: 20, fontSize: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 12 },
-  postCard: {
-    padding: 12,
-    marginBottom: 12,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  postTitle: { fontWeight: "bold", marginBottom: 4 },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 12,
-    marginTop: 10,
-  },
-
-  editButton: {
-    marginTop: 8,
-    backgroundColor: "#007bff",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    alignSelf: "flex-start",
-  },
-  editButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  botaoProfessores: {
-    marginTop: 10,
-  },
-  textoBotao: {
-    color: "gray",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "right",
-  },
-});
