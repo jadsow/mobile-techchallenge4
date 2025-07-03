@@ -12,6 +12,7 @@ import EditProfessorScreen from "../screens/professores/EditProfessorScreen";
 import CreateProfessorScreen from "../screens/professores/CreateProfessorScreen";
 import AlunosListScreen from "../screens/alunos/AlunosListScreen";
 import EditAlunoScreen from "../screens/alunos/EditAlunoScreen";
+import CreateAlunoScreen from "../screens/alunos/CreateAlunoScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -70,8 +71,21 @@ export default function AppNavigator() {
         component={CreateProfessorScreen}
         options={{ headerTitle: "" }}
       />
-      <Stack.Screen name="AlunosList" component={AlunosListScreen} />
-      <Stack.Screen name="EditAluno" component={EditAlunoScreen} />
+      <Stack.Screen
+        name="AlunosList"
+        component={AlunosListScreen}
+        options={{ headerTitle: "" }}
+      />
+      <Stack.Screen
+        name="CreateAluno"
+        component={CreateAlunoScreen}
+        options={{ headerTitle: "" }}
+      />
+      <Stack.Screen
+        name="EditAluno"
+        component={EditAlunoScreen}
+        options={{ headerTitle: "" }}
+      />
     </Stack.Navigator>
   );
 }
