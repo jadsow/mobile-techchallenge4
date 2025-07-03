@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/types";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type PostDetailRouteProp = RouteProp<RootStackParamList, "PostDetail">;
 
@@ -37,7 +37,6 @@ export default function PostDetailScreen() {
 
         const data = await response.json();
         setPost(data);
-        console.log("Post fetched:", data);
       } catch (error) {
         console.error("Erro ao buscar post:", error);
       } finally {
@@ -49,51 +48,31 @@ export default function PostDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator className="text-fiap-primary" size="large" />
       </View>
     );
   }
 
   if (!post) {
     return (
-      <View style={styles.center}>
+      <View className="flex-1 justify-center items-center">
         <Text>Post não encontrado.</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{post.title}</Text>
-      <Text style={styles.author}>Por: {post.author}</Text>
-      <Text style={styles.content}>{post.content}</Text>
-    </View>
+    <SafeAreaView className="flex-1 p-4 gap-3">
+      <Text className="text-3xl font-extrabold text-fiap-primary">
+        {post.title}
+      </Text>
+      <Text className="italic text-lg text-gray-600 text-start">
+        Por {post.author}
+      </Text>
+      <Text className="text-xl text-gray-700 pt-4 border-t-gray-400 border-t-[0.5px]">
+        {post.content}
+      </Text>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    flex: 1,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  author: {
-    fontSize: 16,
-    fontStyle: "italic",
-    marginBottom: 20,
-  },
-  content: {
-    fontSize: 18,
-    lineHeight: 26,
-  },
-});

@@ -1,17 +1,10 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { LoadingButton } from "../../components/LoadingButton";
 import { RootStackParamList } from "../../navigation/types";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -32,7 +25,6 @@ export default function LoginScreen({ navigation }: Props) {
 
   const handleLogin = async () => {
     setLoading(true);
-
     const endpoint =
       tipoUsuario === "professor"
         ? "http://10.0.2.2:3010/auth/login-professor"
@@ -41,34 +33,34 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
       });
 
-      if (!response.ok) {
-        throw new Error("Credenciais inválidas");
-      }
+      if (!response.ok) throw new Error("Credenciais inválidas");
 
       const data = await response.json();
-
       await AsyncStorage.setItem("access_token", data.access_token);
-      Alert.alert("Login realizado com sucesso!");
+      toastSuccess("Sucesso", "Login realizado com sucesso!");
       navigation.replace("Home");
     } catch (error: any) {
-      Alert.alert("Erro", error.message || "Erro ao fazer login");
+      toastError("Erro", error.message || "Erro ao fazer login");
     } finally {
       setLoading(false);
     }
   };
 
+  const isAluno = tipoUsuario === "aluno";
+  const isProfessor = tipoUsuario === "professor";
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <View className="flex-1 justify-center px-4 bg-white">
+      <Text className="color-fiap-primary text-3xl text-center mb-6 font-semibold">
+        Blog Educacional
+      </Text>
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Email"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -77,118 +69,62 @@ export default function LoginScreen({ navigation }: Props) {
       />
 
       <TextInput
-        style={styles.input}
+        className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Senha"
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
       />
 
-      <Text style={styles.label}>Tipo de usuário:</Text>
-      <View style={styles.userTypeContainer}>
+      <Text className="color-fiap-secondary text-base mb-2 text-center font-medium">
+        Tipo de usuário:
+      </Text>
+
+      <View className="flex-row self-center space-x-3 mb-6 bg-fiap-gray rounded-full">
         <TouchableOpacity
-          style={[
-            styles.userTypeButton,
-            tipoUsuario === "aluno" && styles.userTypeButtonSelected,
-          ]}
+          className={`flex-1 px-5 py-3 rounded-full ${
+            isAluno ? "bg-fiap-secondary" : "bg-fiap-gray"
+          }`}
           onPress={() => setTipoUsuario("aluno")}
         >
           <Text
-            style={[
-              styles.userTypeText,
-              tipoUsuario === "aluno" && styles.userTypeTextSelected,
-            ]}
+            className={`text-center text-base font-medium ${
+              isAluno ? "text-white" : "text-gray-100"
+            }`}
           >
             Aluno
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.userTypeButton,
-            tipoUsuario === "professor" && styles.userTypeButtonSelected,
-          ]}
+          className={`flex-1 px-5 py-3 rounded-full ${
+            isProfessor ? "bg-fiap-secondary" : "bg-fiap-gray"
+          }`}
           onPress={() => setTipoUsuario("professor")}
         >
           <Text
-            style={[
-              styles.userTypeText,
-              tipoUsuario === "professor" && styles.userTypeTextSelected,
-            ]}
+            className={`text-center font-medium ${
+              isProfessor ? "text-white" : "text-gray-100"
+            }`}
           >
             Professor
           </Text>
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <>
-          <Button title="Entrar" onPress={handleLogin} />
-          <View style={{ marginTop: 10 }}>
-            <Button
-              title="Registro"
-              onPress={() => navigation.navigate("Register")}
-            />
-          </View>
-        </>
-      )}
+      <LoadingButton
+        className="bg-fiap-primary rounded-lg p-4 items-center mt-4"
+        text="Entrar"
+        loading={loading}
+        onPress={handleLogin}
+      />
+
+      <LoadingButton
+        className="border-fiap-primary border-[1px] rounded-lg p-4 items-center mt-3"
+        text="Registra-se"
+        textProps={{ className: "color-fiap-primary font-semibold" }}
+        onPress={() => navigation.navigate("Register")}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    flex: 1,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#aaa",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-  },
-
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    textAlign: "center",
-    fontWeight: "500",
-  },
-
-  userTypeContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 12,
-    marginBottom: 24,
-  },
-
-  userTypeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    backgroundColor: "#ddd",
-  },
-
-  userTypeButtonSelected: {
-    backgroundColor: "#007bff",
-  },
-
-  userTypeText: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
-  },
-
-  userTypeTextSelected: {
-    color: "#fff",
-  },
-});

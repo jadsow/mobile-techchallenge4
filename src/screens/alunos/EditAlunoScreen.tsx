@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { jwtDecode } from "jwt-decode";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
+import { LoadingButton } from "../../components/LoadingButton";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -44,15 +38,16 @@ export default function EditAlunoScreen() {
     const getToken = async () => {
       const storedToken = await AsyncStorage.getItem("access_token");
       if (!storedToken) {
-        navigation.replace("Login");
-        return;
+        return navigation.replace("Login");
       }
+
       const decoded: any = jwtDecode(storedToken);
+
       if (decoded.role !== "professor") {
-        Alert.alert("Acesso negado", "Apenas professores podem editar alunos.");
-        navigation.goBack();
-        return;
+        toastError("Acesso negado", "Apenas professores podem editar alunos.");
+        return navigation.goBack();
       }
+
       setToken(storedToken);
     };
 
@@ -61,15 +56,15 @@ export default function EditAlunoScreen() {
 
   const handleSalvar = async () => {
     if (!nome || !email) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
+      return toastError("Erro", "Preencha todos os campos.");
     }
     try {
+      setLoading(true);
+
       if (!token) {
-        Alert.alert("Erro", "Token inválido");
-        return;
+        return toastError("Erro", "Token inválido");
       }
-      console.log("Atualizando aluno:", alunoId, nome, email);
+
       const response = await fetch(`http://10.0.2.2:3010/alunos/${alunoId}`, {
         method: "PUT",
         headers: {
@@ -81,60 +76,50 @@ export default function EditAlunoScreen() {
 
       if (!response.ok) throw new Error("Erro ao atualizar");
 
-      Alert.alert("Sucesso", "Aluno atualizado com sucesso.");
+      toastSuccess("Sucesso", "Aluno atualizado com sucesso.");
       navigation.goBack();
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível atualizar o aluno.");
+      toastError("Erro", "Não foi possível atualizar o aluno.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Editar Aluno</Text>
-
+    <ScrollView
+      className="flex-1 bg-white px-4 pt-6 pb-10"
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="Nome"
         value={nome}
         onChangeText={setNome}
       />
+
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="Email"
         value={email}
         keyboardType="email-address"
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
+
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="Senha"
         value={senha}
         onChangeText={setSenha}
         secureTextEntry
       />
-      <Button title="Salvar" onPress={handleSalvar} />
-    </View>
+
+      <LoadingButton
+        loading={loading}
+        text="Salvar"
+        onPress={handleSalvar}
+        className="bg-fiap-primary rounded-lg p-4 items-center mt-2"
+      />
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Button,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { jwtDecode } from "jwt-decode";
+import Icon from "react-native-vector-icons/Feather";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -41,9 +42,8 @@ export default function AlunosListScreen() {
 
     const decoded: any = jwtDecode(storedToken);
     if (decoded.role !== "professor") {
-      Alert.alert("Acesso negado", "Apenas professores podem ver os alunos.");
-      navigation.goBack();
-      return;
+      toastError("Acesso negado", "Apenas professores podem ver os alunos.");
+      return navigation.goBack();
     }
 
     setToken(storedToken);
@@ -60,7 +60,7 @@ export default function AlunosListScreen() {
       const data = await response.json();
       setAlunos(data);
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível carregar os alunos.");
+      toastError("Erro", "Não foi possível carregar os alunos.");
     }
   }, [navigation]);
 
@@ -82,8 +82,7 @@ export default function AlunosListScreen() {
         onPress: async () => {
           try {
             if (!token) {
-              Alert.alert("Erro", "Token inválido");
-              return;
+              return toastError("Erro", "Token inválido");
             }
             const response = await fetch(`http://10.0.2.2:3010/alunos/${id}`, {
               method: "DELETE",
@@ -95,9 +94,9 @@ export default function AlunosListScreen() {
             if (!response.ok) throw new Error("Erro ao deletar aluno");
 
             setAlunos((prev) => prev.filter((a) => a._id !== id));
-            Alert.alert("Sucesso", "Aluno excluído com sucesso.");
+            toastSuccess("Sucesso", "Aluno excluído com sucesso.");
           } catch (error) {
-            Alert.alert("Erro", "Falha ao excluir aluno.");
+            toastError("Erro", "Falha ao excluir aluno.");
           }
         },
       },
@@ -105,22 +104,21 @@ export default function AlunosListScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Lista de Alunos</Text>
-      <Button
-        title="Cadastrar Novo Aluno"
-        onPress={() => navigation.navigate("CreateAluno")}
-      />
+    <View className="flex-1 px-4 py-6 bg-white">
       <FlatList
         data={alunos}
         keyExtractor={(item) => item._id}
+        contentContainerStyle={{ paddingBottom: 100 }}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.nome}>{item.nome}</Text>
-            <Text style={styles.email}>{item.email}</Text>
-            <View style={styles.buttons}>
+          <View className="bg-gray-100 p-4 rounded-lg mb-3">
+            <Text className="text-lg text-fiap-primary font-semibold">
+              {item.nome}
+            </Text>
+            <Text className="text-gray-600">{item.email}</Text>
+
+            <View className="flex-row w-full justify-between mt-4 gap-2">
               <TouchableOpacity
-                style={styles.editButton}
+                className="flex-row items-center border border-blue-300 rounded-md px-3 py-2"
                 onPress={() =>
                   navigation.navigate("EditAluno", {
                     alunoId: item._id,
@@ -129,55 +127,39 @@ export default function AlunosListScreen() {
                   })
                 }
               >
-                <Text style={styles.buttonText}>Editar</Text>
+                <Icon name="edit-2" size={16} color="#3B82F6" />
+                <Text className="text-blue-500 font-semibold ml-2">Editar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.deleteButton}
+                className="flex-row items-center border border-red-300 rounded-md px-3 py-2"
                 onPress={() => handleDelete(item._id)}
               >
-                <Text style={styles.buttonText}>Excluir</Text>
+                <Icon name="trash-2" size={16} color="#DC2626" />
+                <Text className="text-red-600 font-semibold ml-2">Excluir</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
       />
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate("CreateAluno")}
+        className="flex-row absolute bottom-6 right-6 bg-fiap-primary p-4 rounded-full items-center gap-2"
+        style={styles.fabButtonShadow}
+      >
+        <Icon name="plus" size={24} color="white" />
+        <Text className="text-white font-bold text-base">Novo aluno</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  card: {
-    backgroundColor: "#f0f0f0",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  nome: { fontWeight: "bold", fontSize: 16 },
-  email: { color: "#666" },
-  buttons: {
-    flexDirection: "row",
-    marginTop: 10,
-    justifyContent: "space-between",
-  },
-  editButton: {
-    backgroundColor: "#007bff",
-    padding: 6,
-    borderRadius: 6,
-  },
-  deleteButton: {
-    backgroundColor: "red",
-    padding: 6,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  fabButtonShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 6,
   },
 });

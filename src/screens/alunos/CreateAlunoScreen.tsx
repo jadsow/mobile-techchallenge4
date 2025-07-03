@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { jwtDecode } from "jwt-decode";
+import { LoadingButton } from "../../components/LoadingButton";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -14,6 +16,7 @@ type NavigationProp = NativeStackNavigationProp<
 export default function CreateAlunoScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -29,9 +32,8 @@ export default function CreateAlunoScreen() {
 
       const decoded: any = jwtDecode(storedToken);
       if (decoded.role !== "professor") {
-        Alert.alert("Acesso negado", "Apenas professores podem criar alunos.");
-        navigation.goBack();
-        return;
+        toastError("Acesso negado", "Apenas professores podem criar alunos.");
+        return navigation.goBack();
       }
 
       setToken(storedToken);
@@ -42,11 +44,12 @@ export default function CreateAlunoScreen() {
 
   const handleSubmit = async () => {
     if (!nome || !email || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos.");
-      return;
+      return toastError("Erro", "Preencha todos os campos.");
     }
 
     try {
+      setLoading(true);
+
       const response = await fetch("http://10.0.2.2:3010/alunos", {
         method: "POST",
         headers: {
@@ -64,26 +67,36 @@ export default function CreateAlunoScreen() {
         throw new Error("Erro ao criar aluno.");
       }
 
-      Alert.alert("Sucesso", "Aluno criado com sucesso!");
+      toastSuccess("Sucesso", "Aluno criado com sucesso!");
       navigation.goBack();
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível criar o aluno.");
+      toastError("Erro", "Não foi possível criar o aluno.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastrar Aluno</Text>
+    <ScrollView
+      className="flex-1 bg-white px-4 pt-6 pb-10"
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
+      <View className="bg-yellow-50 border border-gray-200 rounded-md p-3 mb-5">
+        <Text className="italic text-sm text-gray-700">
+          Preencha os dados do aluno corretamente. Um email válido e uma senha
+          segura são obrigatórios.
+        </Text>
+      </View>
 
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="Nome"
         value={nome}
         onChangeText={setNome}
       />
 
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="E-mail"
         value={email}
         onChangeText={setEmail}
@@ -92,31 +105,19 @@ export default function CreateAlunoScreen() {
       />
 
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="Senha"
         value={senha}
         onChangeText={setSenha}
         secureTextEntry
       />
 
-      <Button title="Cadastrar" onPress={handleSubmit} />
-    </View>
+      <LoadingButton
+        loading={loading}
+        className="bg-fiap-primary rounded-lg p-4 items-center mt-2"
+        text="Cadastrar"
+        onPress={handleSubmit}
+      />
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
-  },
-});

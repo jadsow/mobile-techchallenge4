@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { Text, TextInput, Alert, ScrollView } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoadingButton } from "../../components/LoadingButton";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type EditProfessorRouteProp = RouteProp<RootStackParamList, "EditProfessor">;
 
@@ -28,7 +30,7 @@ export default function EditProfessorScreen() {
         setNome(data.nome);
         setEmail(data.email);
       } catch (err) {
-        Alert.alert("Erro ao buscar dados do professor.");
+        toastError("Não encontrado", "Erro ao buscar dados do professor.");
       }
     };
 
@@ -42,8 +44,7 @@ export default function EditProfessorScreen() {
 
   const handleSave = async () => {
     if (!isValidEmail(email)) {
-      Alert.alert("Erro", "Por favor, insira um email válido.");
-      return;
+      return toastError("Erro", "Por favor, insira um email válido.");
     }
 
     try {
@@ -62,58 +63,80 @@ export default function EditProfessorScreen() {
 
       if (!res.ok) throw new Error();
 
-      Alert.alert("Sucesso", "Professor atualizado.");
+      toastSuccess("Sucesso", "Professor atualizado.");
       navigation.goBack();
     } catch (err) {
-      Alert.alert("Erro", "Não foi possível atualizar.");
+      toastError("Erro", "Não foi possível atualizar.");
     }
   };
 
   const handleDelete = async () => {
-    try {
-      const token = await AsyncStorage.getItem("access_token");
-      const res = await fetch(
-        `http://10.0.2.2:3010/professores/${professorId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    Alert.alert("Confirmação", "Deseja realmente excluir este professor?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const token = await AsyncStorage.getItem("access_token");
+            const res = await fetch(
+              `http://10.0.2.2:3010/professores/${professorId}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
 
-      if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error();
 
-      Alert.alert("Removido", "Professor deletado com sucesso.");
-      navigation.goBack();
-    } catch (err) {
-      Alert.alert("Erro", "Erro ao deletar professor.");
-    }
+            toastSuccess("Removido", "Professor deletado com sucesso.");
+            navigation.goBack();
+          } catch (err) {
+            toastError("Erro", "Erro ao deletar professor.");
+          }
+        },
+      },
+    ]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Nome</Text>
-      <TextInput style={styles.input} value={nome} onChangeText={setNome} />
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      className="bg-white px-4 pt-6 pb-10"
+    >
+      <Text className="font-semibold mb-2">Nome</Text>
+      <TextInput
+        className="border border-gray-300 rounded-md p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
+        value={nome}
+        onChangeText={setNome}
+        placeholder="Digite o nome"
+      />
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+      <Text className="font-semibold mb-2">E-mail</Text>
+      <TextInput
+        className="border border-gray-300 rounded-md p-3 bg-gray-50 mb-6 focus:border-fiap-primary"
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Digite o e-mail"
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-      <Button title="Salvar Alterações" onPress={handleSave} />
-      <View style={{ marginVertical: 10 }} />
-      <Button title="Excluir Professor" color="red" onPress={handleDelete} />
-    </View>
+      <LoadingButton
+        text="Salvar Alterações"
+        onPress={handleSave}
+        className="bg-fiap-primary rounded-lg p-4 items-center"
+      />
+
+      <LoadingButton
+        text="Excluir Professor"
+        onPress={handleDelete}
+        loading={false}
+        className="bg-fiap-primary/20 border border-fiap-secondary rounded-lg p-4 items-center mt-4"
+        textProps={{ className: "text-fiap-secondary font-semibold" }}
+      />
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { padding: 16 },
-  label: { marginBottom: 4, fontWeight: "bold" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    marginBottom: 12,
-    padding: 8,
-  },
-});

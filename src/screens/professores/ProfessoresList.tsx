@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  Button,
   FlatList,
   Alert,
   StyleSheet,
@@ -13,6 +12,9 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { jwtDecode } from "jwt-decode";
+
+import Icon from "react-native-vector-icons/Feather";
+import { toastError, toastSuccess } from "../../helpers/toast";
 
 type DecodedToken = {
   sub: string;
@@ -61,7 +63,7 @@ export default function ProfessoresListScreen() {
       const data = await response.json();
       setProfessores(data);
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível carregar os professores");
+      toastError("Erro", "Não foi possível carregar os professores");
       setProfessores([]);
     } finally {
       setLoading(false);
@@ -84,9 +86,6 @@ export default function ProfessoresListScreen() {
           try {
             const decoded: DecodedToken = jwtDecode(token);
 
-            console.log("Decoded Token:", decoded);
-            console.log("Deleting ID:", id);
-
             const response = await fetch(
               `http://10.0.2.2:3010/professores/${id}`,
               {
@@ -99,7 +98,7 @@ export default function ProfessoresListScreen() {
 
             if (!response.ok) throw new Error("Erro ao excluir");
 
-            Alert.alert("Sucesso", "Professor excluído");
+            toastSuccess("Sucesso", "Professor excluído");
 
             if (decoded.sub === id) {
               await AsyncStorage.removeItem("access_token");
@@ -109,7 +108,7 @@ export default function ProfessoresListScreen() {
               fetchProfessores(token);
             }
           } catch (error) {
-            Alert.alert("Erro", "Falha ao excluir professor");
+            toastError("Erro", "Falha ao excluir professor");
           }
         },
       },
@@ -117,28 +116,43 @@ export default function ProfessoresListScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Professores Cadastrados</Text>
-
+    <View className="flex-1 px-4 py-5 bg-white">
       {loading ? (
-        <Text>Carregando...</Text>
+        <Text className="text-center text-gray-500">Carregando...</Text>
       ) : (
         <FlatList
           data={professores}
           keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 16 }}
           renderItem={({ item }) => (
-            <View style={styles.professorCard}>
-              <View>
-                <Text style={styles.name}>{item.nome}</Text>
-                <Text>{item.email}</Text>
+            <View className="flex-col justify-between items-start bg-gray-100 p-4 rounded-lg mb-3">
+              <View className="flex-1 pr-2">
+                <Text className="text-fiap-secondary font-bold text-lg">
+                  {item.nome}
+                </Text>
+                <Text className="text-gray-700">{item.email}</Text>
               </View>
-              <View style={styles.actions}>
-                <Button title="Editar" onPress={() => handleEdit(item._id)} />
-                <Button
-                  title="Excluir"
-                  color="red"
+
+              <View className="flex-row w-full justify-between mt-4 gap-2">
+                <TouchableOpacity
+                  className="flex-row items-center border border-blue-300 rounded-md px-3 py-2"
+                  onPress={() => handleEdit(item._id)}
+                >
+                  <Icon name="edit-2" size={16} color="#3B82F6" />
+                  <Text className="text-blue-500 font-semibold ml-2">
+                    Editar
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="flex-row items-center border border-red-300 rounded-md px-3 py-2"
                   onPress={() => handleDelete(item._id)}
-                />
+                >
+                  <Icon name="trash-2" size={16} color="#DC2626" />
+                  <Text className="text-red-600 font-semibold ml-2">
+                    Excluir
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -146,53 +160,23 @@ export default function ProfessoresListScreen() {
       )}
 
       <TouchableOpacity
-        style={styles.createButtonBottom}
+        className="flex-row absolute bottom-6 right-6 bg-fiap-primary p-4 rounded-full items-center gap-2"
+        style={styles.fabButtonShadow}
         onPress={() => navigation.navigate("CreateProfessor")}
       >
-        <Text style={styles.createButtonText}>+ Criar Professor</Text>
+        <Icon name="plus" size={24} color="white" />
+        <Text className="text-white font-bold text-base">Novo Professor</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 12 },
-  professorCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    marginBottom: 8,
-    backgroundColor: "#fff",
-  },
-  name: { fontWeight: "bold", fontSize: 16 },
-  actions: { flexDirection: "row", gap: 8 },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  createButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  createButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  createButtonBottom: {
-    backgroundColor: "#007bff",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 16,
-    alignItems: "center",
+  fabButtonShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 6,
   },
 });
