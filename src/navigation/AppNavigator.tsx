@@ -18,7 +18,20 @@ const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Loading">
+    <Stack.Navigator
+      initialRouteName="Loading"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#fff",
+        },
+        headerShadowVisible: false,
+        headerTintColor: "#F23064",
+        headerTitleStyle: {
+          fontWeight: "bold",
+          fontSize: 20,
+        },
+      }}
+    >
       <Stack.Screen
         name="Loading"
         component={LoadingScreen}
@@ -33,7 +46,7 @@ export default function AppNavigator() {
         name="Register"
         component={RegisterScreen}
         options={{
-          headerTitle: "",
+          headerTitle: "Cadastro",
         }}
       />
       <Stack.Screen
@@ -59,32 +72,32 @@ export default function AppNavigator() {
       <Stack.Screen
         name="ProfessoresList"
         component={ProfessoresListScreen}
-        options={{ headerTitle: "" }}
+        options={{ headerTitle: "Professores Cadastrados" }}
       />
       <Stack.Screen
         name="EditProfessor"
         component={EditProfessorScreen}
-        options={{ headerTitle: "" }}
+        options={{ headerTitle: "Editar Professor" }}
       />
       <Stack.Screen
         name="CreateProfessor"
         component={CreateProfessorScreen}
-        options={{ headerTitle: "" }}
+        options={{ headerTitle: "Novo Professor" }}
       />
       <Stack.Screen
         name="AlunosList"
         component={AlunosListScreen}
-        options={{ headerTitle: "" }}
+        options={{ headerTitle: "Lista de Alunos" }}
       />
       <Stack.Screen
         name="CreateAluno"
         component={CreateAlunoScreen}
-        options={{ headerTitle: "" }}
+        options={{ headerTitle: "Cadastrar Aluno" }}
       />
       <Stack.Screen
         name="EditAluno"
         component={EditAlunoScreen}
-        options={{ headerTitle: "" }}
+        options={{ headerTitle: "Editar Aluno" }}
       />
     </Stack.Navigator>
   );

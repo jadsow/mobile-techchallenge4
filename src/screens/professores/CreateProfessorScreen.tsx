@@ -61,10 +61,6 @@ export default function CreateProfessorScreen() {
       contentContainerStyle={{ flexGrow: 1 }}
       className="bg-white px-4 pt-6 pb-10"
     >
-      <Text className="text-2xl font-bold text-start mb-3 color-fiap-primary">
-        Novo Professor
-      </Text>
-
       <View className="bg-blue-50 border border-blue-100 rounded-md p-3 mb-5">
         <Text className="italic text-sm text-gray-700">
           Preencha os dados do professor com atenção. O e-mail e a senha serão

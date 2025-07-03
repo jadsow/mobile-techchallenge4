@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
+import { TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { jwtDecode } from "jwt-decode";
@@ -99,10 +90,6 @@ export default function EditAlunoScreen() {
       className="flex-1 bg-white px-4 pt-6 pb-10"
       contentContainerStyle={{ flexGrow: 1 }}
     >
-      <Text className="text-2xl font-bold text-center text-fiap-primary mb-6">
-        Editar Aluno
-      </Text>
-
       <TextInput
         className="border border-gray-300 rounded-lg p-3 bg-gray-50 mb-4 focus:border-fiap-primary"
         placeholder="Nome"

@@ -81,10 +81,6 @@ export default function CreateAlunoScreen() {
       className="flex-1 bg-white px-4 pt-6 pb-10"
       contentContainerStyle={{ flexGrow: 1 }}
     >
-      <Text className="text-2xl font-bold text-center text-fiap-primary mb-6">
-        Cadastrar Aluno
-      </Text>
-
       <View className="bg-yellow-50 border border-gray-200 rounded-md p-3 mb-5">
         <Text className="italic text-sm text-gray-700">
           Preencha os dados do aluno corretamente. Um email válido e uma senha

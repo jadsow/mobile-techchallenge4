@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -105,10 +105,6 @@ export default function AlunosListScreen() {
 
   return (
     <View className="flex-1 px-4 py-6 bg-white">
-      <Text className="text-center text-2xl font-bold mb-4 text-fiap-primary">
-        Lista de Alunos
-      </Text>
-
       <FlatList
         data={alunos}
         keyExtractor={(item) => item._id}

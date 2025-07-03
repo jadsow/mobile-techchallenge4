@@ -106,10 +106,6 @@ export default function EditProfessorScreen() {
       contentContainerStyle={{ flexGrow: 1 }}
       className="bg-white px-4 pt-6 pb-10"
     >
-      <Text className="text-2xl font-bold text-start mb-4 color-fiap-primary">
-        Editar Professor
-      </Text>
-
       <Text className="font-semibold mb-2">Nome</Text>
       <TextInput
         className="border border-gray-300 rounded-md p-3 bg-gray-50 mb-4 focus:border-fiap-primary"

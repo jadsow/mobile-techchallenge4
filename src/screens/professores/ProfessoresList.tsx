@@ -117,10 +117,6 @@ export default function ProfessoresListScreen() {
 
   return (
     <View className="flex-1 px-4 py-5 bg-white">
-      <Text className="text-2xl font-bold mb-4 color-fiap-primary">
-        Professores Cadastrados
-      </Text>
-
       {loading ? (
         <Text className="text-center text-gray-500">Carregando...</Text>
       ) : (
@@ -130,7 +126,7 @@ export default function ProfessoresListScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 16 }}
           renderItem={({ item }) => (
-            <View className="flex-col justify-between items-start bg-white border border-fiap-primary/30 rounded-lg p-4 mb-3">
+            <View className="flex-col justify-between items-start bg-gray-100 p-4 rounded-lg mb-3">
               <View className="flex-1 pr-2">
                 <Text className="text-fiap-secondary font-bold text-lg">
                   {item.nome}
@@ -138,7 +134,7 @@ export default function ProfessoresListScreen() {
                 <Text className="text-gray-700">{item.email}</Text>
               </View>
 
-              <View className="flex-row w-full justify-end gap-2">
+              <View className="flex-row w-full justify-between mt-4 gap-2">
                 <TouchableOpacity
                   className="flex-row items-center border border-blue-300 rounded-md px-3 py-2"
                   onPress={() => handleEdit(item._id)}
@@ -169,7 +165,7 @@ export default function ProfessoresListScreen() {
         onPress={() => navigation.navigate("CreateProfessor")}
       >
         <Icon name="plus" size={24} color="white" />
-        <Text className="text-white font-bold text-base">Criar Professor</Text>
+        <Text className="text-white font-bold text-base">Novo Professor</Text>
       </TouchableOpacity>
     </View>
   );

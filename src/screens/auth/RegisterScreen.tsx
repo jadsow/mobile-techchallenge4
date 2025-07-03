@@ -69,11 +69,7 @@ export default function RegisterScreen({ navigation }: Props) {
   };
 
   return (
-    <View className="flex-1 justify-center px-4 bg-white">
-      <Text className="text-3xl font-semibold text-center mb-6 color-fiap-primary">
-        Cadastro
-      </Text>
-
+    <View className="flex-1  px-4 bg-white">
       <TextInput
         className="bg-gray-100 rounded-md p-4 mb-4 border border-gray-200 focus:border-fiap-primary"
         placeholder="Nome"
