@@ -55,9 +55,21 @@ export default function AppNavigator() {
         component={EditPostScreen}
         options={{ headerTitle: "Editar" }}
       />
-      <Stack.Screen name="ProfessoresList" component={ProfessoresListScreen} />
-      <Stack.Screen name="EditProfessor" component={EditProfessorScreen} />
-      <Stack.Screen name="CreateProfessor" component={CreateProfessorScreen} />
+      <Stack.Screen
+        name="ProfessoresList"
+        component={ProfessoresListScreen}
+        options={{ headerTitle: "" }}
+      />
+      <Stack.Screen
+        name="EditProfessor"
+        component={EditProfessorScreen}
+        options={{ headerTitle: "" }}
+      />
+      <Stack.Screen
+        name="CreateProfessor"
+        component={CreateProfessorScreen}
+        options={{ headerTitle: "" }}
+      />
       <Stack.Screen name="AlunosList" component={AlunosListScreen} />
       <Stack.Screen name="EditAluno" component={EditAlunoScreen} />
     </Stack.Navigator>
