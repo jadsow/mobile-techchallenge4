@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Text, TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 import { RootStackParamList } from "../../navigation/types";
 import { LoadingButton } from "../../components/LoadingButton";
+
 import { toastError, toastSuccess } from "../../helpers/toast";
 
-type Props = NativeStackScreenProps<RootStackParamList, "EditPost">;
+export default function EditPostScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "EditPost">>();
+  const route = useRoute<RouteProp<RootStackParamList, "EditPost">>();
 
-export default function EditPostScreen({ route, navigation }: Props) {
   const { postId } = route.params;
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");

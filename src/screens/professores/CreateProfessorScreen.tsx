@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { toastError, toastSuccess } from "../../helpers/toast";
 import { LoadingButton } from "../../components/LoadingButton";
+import { useNavigation } from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, "CreateProfessor">;
+export default function CreateProfessorScreen() {
+  const navigation =
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "CreateProfessor">
+    >();
 
-export default function CreateProfessorScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
 
   const [nome, setNome] = useState("");
