@@ -121,7 +121,7 @@ export default function LoginScreen({ navigation }: Props) {
 
       <LoadingButton
         className="border-fiap-primary border-[1px] rounded-lg p-4 items-center mt-3"
-        text="Registra-se"
+        text="Registro"
         textProps={{ className: "color-fiap-primary font-semibold" }}
         onPress={() => navigation.navigate("Register")}
       />
