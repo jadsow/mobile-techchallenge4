@@ -164,7 +164,7 @@ export default function ProfessoresListScreen() {
       )}
 
       <TouchableOpacity
-        className="flex-row absolute bottom-6 right-6 bg-fiap-secondary p-4 rounded-full items-center gap-2"
+        className="flex-row absolute bottom-6 right-6 bg-fiap-primary p-4 rounded-full items-center gap-2"
         style={styles.fabButtonShadow}
         onPress={() => navigation.navigate("CreateProfessor")}
       >
